@@ -98,11 +98,16 @@ async function navigatePage(url, source, push = true) {
     if (push) history.pushState({portfolio:true}, '', url);
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const r = rect || {top:36, right:innerWidth / 2 + 40, bottom:72, left:innerWidth / 2 - 40, height:36};
+      // Keep capsule ends round; overscan until even the viewport corners
+      // sit inside the pill, rather than morphing it into a rectangle.
+      const overscan = Math.max(innerWidth, innerHeight);
+      const finalRadius = (innerHeight + overscan * 2) / 2;
+      const finalInset = `-${overscan}px -${overscan}px -${overscan}px -${overscan}px`;
       const bounds = [
         {clipPath:`inset(${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px round ${r.height/2}px)`},
-        {clipPath:'inset(0px 0px 0px 0px round 0px)'}
+        {clipPath:`inset(${finalInset} round ${finalRadius}px)`}
       ];
-      const timing = {duration:850, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'};
+      const timing = {duration:1200, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'};
       colorReveal = document.createElement('div');
       colorReveal.className = 'page-color-reveal';
       colorReveal.setAttribute('aria-hidden', 'true');
@@ -115,7 +120,7 @@ async function navigatePage(url, source, push = true) {
           inset:`${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px`,
           borderRadius:`${r.height/2}px`, borderColor:'#c1d0ad'
         },
-        {inset:'0px 0px 0px 0px', borderRadius:'0px', borderColor:'#c1d0ad00'}
+        {inset:finalInset, borderRadius:`${finalRadius}px`, borderColor:'#c1d0ad'}
       ], timing);
       await Promise.all([animation.finished, colorExpansion.finished]);
       colorReveal.remove();
