@@ -58,11 +58,106 @@ portal.addEventListener('focus', () => portal.style.setProperty('--proximity', '
 portal.addEventListener('click', () => enter());
 document.querySelector('.skip').addEventListener('click', () => enter('#home', false));
 document.querySelector('.monogram').addEventListener('click', event => {event.preventDefault();enter();});
-document.querySelector('.replay').addEventListener('click', () => {
-  history.replaceState(null, '', location.pathname + location.search);
-  entrance.classList.remove('dismissed'); entrance.inert = false; entrance.removeAttribute('aria-hidden');
-  portfolio.inert = true; portfolio.setAttribute('aria-hidden', 'true'); portfolio.classList.remove('active');
-  theme.content = '#111210'; portal.style.setProperty('--proximity', '0');
-  window.scrollTo({top:0,behavior:'instant'}); portal.focus({preventScroll:true});
+
+const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
+let navigating = false;
+history.replaceState({portfolio:true}, '', location.href);
+
+async function navigatePage(url, source, push = true) {
+  if (navigating || entering) return;
+  navigating = true;
+  let snapshot;
+  let animation;
+  let colorReveal;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Page could not be loaded');
+    const next = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const nextPortfolio = next.querySelector('.portfolio');
+    if (!nextPortfolio) throw new Error('Invalid portfolio page');
+    const rect = source?.getBoundingClientRect();
+    const oldScroll = window.scrollY;
+    snapshot = document.createElement('div');
+    snapshot.className = 'page-snapshot';
+    snapshot.inert = true;
+    snapshot.setAttribute('aria-hidden', 'true');
+    const previous = portfolio.cloneNode(true);
+    previous.style.transform = `translateY(-${oldScroll}px)`;
+    snapshot.append(previous);
+    document.body.append(snapshot);
+    document.body.classList.add('page-changing');
+    portfolio.inert = true;
+    portfolio.innerHTML = nextPortfolio.innerHTML;
+    document.body.dataset.page = next.body.dataset.page;
+    document.title = next.title;
+    entrance.classList.add('dismissed');
+    entrance.inert = true;
+    entrance.setAttribute('aria-hidden', 'true');
+    portfolio.classList.add('active', 'revealing');
+    window.scrollTo({top:0, behavior:'instant'});
+    if (push) history.pushState({portfolio:true}, '', url);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const r = rect || {top:36, right:innerWidth / 2 + 40, bottom:72, left:innerWidth / 2 - 40, height:36};
+      const bounds = [
+        {clipPath:`inset(${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px round ${r.height/2}px)`},
+        {clipPath:'inset(0px 0px 0px 0px round 0px)'}
+      ];
+      const timing = {duration:850, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'};
+      colorReveal = document.createElement('div');
+      colorReveal.className = 'page-color-reveal';
+      colorReveal.setAttribute('aria-hidden', 'true');
+      document.body.append(colorReveal);
+      animation = portfolio.animate(bounds, timing);
+      // A transparent sage outline tracks the clipping boundary. The actual
+      // destination stays visible inside the expanding pill from the first frame.
+      const colorExpansion = colorReveal.animate([
+        {
+          inset:`${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px`,
+          borderRadius:`${r.height/2}px`, borderColor:'#c1d0ad'
+        },
+        {inset:'0px 0px 0px 0px', borderRadius:'0px', borderColor:'#c1d0ad00'}
+      ], timing);
+      await Promise.all([animation.finished, colorExpansion.finished]);
+      colorReveal.remove();
+    }
+    portfolio.classList.remove('revealing');
+    animation?.cancel();
+    snapshot.remove();
+    document.body.classList.remove('page-changing');
+    portfolio.inert = false;
+    portfolio.setAttribute('aria-hidden','false');
+    const heading = portfolio.querySelector('h1,h2');
+    if (heading) {heading.tabIndex = -1;heading.focus({preventScroll:true});}
+  } catch (error) {
+    // Real HTML destinations also work if fetch or animation is unavailable.
+    window.location.assign(url);
+  } finally {
+    colorReveal?.remove();
+    navigating = false;
+  }
+}
+
+document.addEventListener('click', async event => {
+  const replay = event.target.closest('.replay');
+  if (replay) {
+    if (navigating || entering) return;
+    if (document.body.dataset.page !== 'home') {
+      await navigatePage(new URL('index.html', location.href).href, replay);
+    }
+    entrance.classList.remove('dismissed'); entrance.inert = false; entrance.removeAttribute('aria-hidden');
+    portfolio.inert = true; portfolio.setAttribute('aria-hidden', 'true'); portfolio.classList.remove('active');
+    portal.style.setProperty('--proximity', '0');
+    window.scrollTo({top:0,behavior:'instant'}); portal.focus({preventScroll:true});
+    return;
+  }
+  const link = event.target.closest('a[href]');
+  if (!link || !portfolio.contains(link) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
+  const url = new URL(link.href);
+  if (url.origin !== location.origin || !pageFiles.includes(url.pathname.split('/').pop())) return;
+  event.preventDefault();
+  const currentFile = location.pathname.split('/').pop() || 'index.html';
+  if (url.pathname.split('/').pop() === currentFile) return;
+  await navigatePage(url.href, link);
 });
-if (['#home','#about','#work','#contact'].includes(location.hash)) enter(location.hash, false);
+window.addEventListener('popstate', () => navigatePage(location.href, null, false));
+if (document.body.dataset.page === 'home' && location.hash === '#home') enter('#home', false);
