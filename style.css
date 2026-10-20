@@ -40,7 +40,6 @@
 .main-header nav a:hover::before,.main-header nav a:focus-visible::before{opacity:1;transform:scale(1)}
 .main-header nav:has(a:hover) a:not(:hover)::before{opacity:0;transform:scaleX(.12) scaleY(.65)}
 .main-header nav:has(a:hover) a:not(:hover){color:#aaa9a2}
-.page-color-reveal{position:fixed;inset:0;z-index:12;pointer-events:none;background:transparent;border:0;box-shadow:0 0 24px 9px #c1d0ad55,inset 0 0 22px 7px #c1d0ad40;filter:blur(8px);will-change:inset,border-radius,opacity}
 body:not([data-page="home"]) main{min-height:calc(100svh - 170px)}
 body:not([data-page="home"]) .section{min-height:calc(100svh - 170px)}
 body.page-changing{overflow:hidden}

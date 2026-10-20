@@ -68,7 +68,6 @@ async function navigatePage(url, source, push = true) {
   navigating = true;
   let snapshot;
   let animation;
-  let colorReveal;
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Page could not be loaded');
@@ -108,22 +107,8 @@ async function navigatePage(url, source, push = true) {
         {clipPath:`inset(${finalInset} round ${finalRadius}px)`, filter:'blur(0px)'}
       ];
       const timing = {duration:1400, easing:'cubic-bezier(.45,.05,.2,1)', fill:'forwards'};
-      colorReveal = document.createElement('div');
-      colorReveal.className = 'page-color-reveal';
-      colorReveal.setAttribute('aria-hidden', 'true');
-      document.body.append(colorReveal);
       animation = portfolio.animate(bounds, timing);
-      // A diffused sage halo follows the pill while the real page sharpens inside.
-      // Its center remains transparent throughout the reveal.
-      const colorExpansion = colorReveal.animate([
-        {
-          inset:`${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px`,
-          borderRadius:`${r.height/2}px`, opacity:1
-        },
-        {inset:finalInset, borderRadius:`${finalRadius}px`, opacity:0}
-      ], timing);
-      await Promise.all([animation.finished, colorExpansion.finished]);
-      colorReveal.remove();
+      await animation.finished;
     }
     portfolio.classList.remove('revealing');
     animation?.cancel();
@@ -137,7 +122,6 @@ async function navigatePage(url, source, push = true) {
     // Real HTML destinations also work if fetch or animation is unavailable.
     window.location.assign(url);
   } finally {
-    colorReveal?.remove();
     navigating = false;
   }
 }
