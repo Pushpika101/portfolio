@@ -30,7 +30,7 @@ async function enter(target = '#home', animate = true) {
     const reveal = portfolio.animate([
       {clipPath:start, filter:'blur(10px)'},
       {clipPath:'inset(0px 0px 0px 0px round 0px)', filter:'blur(0px)'}
-    ], {duration:1250, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'});
+    ], {duration:1300, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'});
     await reveal.finished;
     portfolio.classList.add('active');
     portfolio.classList.remove('revealing');
@@ -104,23 +104,23 @@ async function navigatePage(url, source, push = true) {
       const finalRadius = (innerHeight + overscan * 2) / 2;
       const finalInset = `-${overscan}px -${overscan}px -${overscan}px -${overscan}px`;
       const bounds = [
-        {clipPath:`inset(${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px round ${r.height/2}px)`},
-        {clipPath:`inset(${finalInset} round ${finalRadius}px)`}
+        {clipPath:`inset(${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px round ${r.height/2}px)`, filter:'blur(7px)'},
+        {clipPath:`inset(${finalInset} round ${finalRadius}px)`, filter:'blur(0px)'}
       ];
-      const timing = {duration:1200, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards'};
+      const timing = {duration:1400, easing:'cubic-bezier(.45,.05,.2,1)', fill:'forwards'};
       colorReveal = document.createElement('div');
       colorReveal.className = 'page-color-reveal';
       colorReveal.setAttribute('aria-hidden', 'true');
       document.body.append(colorReveal);
       animation = portfolio.animate(bounds, timing);
-      // A transparent sage outline tracks the clipping boundary. The actual
-      // destination stays visible inside the expanding pill from the first frame.
+      // A diffused sage halo follows the pill while the real page sharpens inside.
+      // Its center remains transparent throughout the reveal.
       const colorExpansion = colorReveal.animate([
         {
           inset:`${Math.max(0,r.top)}px ${Math.max(0,innerWidth-r.right)}px ${Math.max(0,innerHeight-r.bottom)}px ${Math.max(0,r.left)}px`,
-          borderRadius:`${r.height/2}px`, borderColor:'#c1d0ad'
+          borderRadius:`${r.height/2}px`, opacity:1
         },
-        {inset:finalInset, borderRadius:`${finalRadius}px`, borderColor:'#c1d0ad'}
+        {inset:finalInset, borderRadius:`${finalRadius}px`, opacity:0}
       ], timing);
       await Promise.all([animation.finished, colorExpansion.finished]);
       colorReveal.remove();
