@@ -33,16 +33,59 @@
 @media(max-width:420px){.social-links{gap:5px}.hero-social .social-links a{width:30px;height:30px}}
 
 /* Each destination is a page; links remain usable without JavaScript. */
-.main-header nav{gap:6px}
-.main-header nav a{position:relative;isolation:isolate;padding:11px 17px;border-radius:999px;background:transparent;transition:color .2s}
-.main-header nav a::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:999px;background:linear-gradient(135deg,#e0e8d8dd,#a9bd94cc);box-shadow:inset 0 1px 0 #ffffff50,0 0 18px #c1d0ad25;backdrop-filter:blur(8px);opacity:0;transform:scaleX(.12) scaleY(.65);transition:transform .36s cubic-bezier(.22,1,.36,1),opacity .18s}
-.main-header nav a[aria-current="page"]{color:#eeede5}
-.main-header nav a:hover,.main-header nav a:focus-visible{color:#20261b}
-.main-header nav a:hover::before,.main-header nav a:focus-visible::before{opacity:1;transform:scale(1)}
-.main-header nav:has(a:hover) a:not(:hover)::before{opacity:0;transform:scaleX(.12) scaleY(.65)}
-.main-header nav:has(a:hover) a:not(:hover){color:#aaa9a2}
+.site-nav{gap:6px}
+.site-nav a{position:relative;isolation:isolate;padding:11px 17px;border-radius:999px;background:transparent;transition:color .2s}
+.site-nav a::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:999px;background:linear-gradient(135deg,#e0e8d8dd,#a9bd94cc);box-shadow:inset 0 1px 0 #ffffff50,0 0 18px #c1d0ad25;backdrop-filter:blur(8px);opacity:0;transform:scaleX(.12) scaleY(.65);transition:transform .36s cubic-bezier(.22,1,.36,1),opacity .18s}
+.site-nav a[aria-current="page"]{color:#eeede5}
+.site-nav a:hover,.site-nav a:focus-visible{color:#20261b}
+.site-nav a:hover::before,.site-nav a:focus-visible::before{opacity:1;transform:scale(1)}
+.site-nav:has(a:hover) a:not(:hover)::before{opacity:0;transform:scaleX(.12) scaleY(.65)}
+.site-nav:has(a:hover) a:not(:hover){color:#aaa9a2}
 body:not([data-page="home"]) main{min-height:calc(100svh - 170px)}
 body:not([data-page="home"]) .section{min-height:calc(100svh - 170px)}
 body.page-changing{overflow:hidden}
 .page-snapshot{position:fixed;inset:0;z-index:10;pointer-events:none;overflow:hidden;background:#111210}
-@media(max-width:650px){.main-header{height:auto;min-height:110px;flex-wrap:wrap;gap:14px;padding-top:18px;padding-bottom:14px}.main-header nav{order:3;width:100%;justify-content:center}.main-header nav a{padding:9px 16px}.hero{height:calc(100svh - 175px)}}
+@media(max-width:650px){.main-header{height:auto;min-height:110px;flex-wrap:wrap;gap:14px;padding-top:18px;padding-bottom:14px}.site-nav{order:3;width:100%;justify-content:center}.site-nav a{padding:9px 16px}.hero{height:calc(100svh - 175px)}}
+
+/* Right-edge chapter tabs stay within their own gutter. */
+.portfolio{padding-right:140px}
+.site-nav{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;align-items:stretch;gap:10px;width:112px;padding:10px 0}
+.site-nav a{padding:14px 15px;text-align:right;font-size:13px}
+.site-nav a[aria-current="page"]{color:#d6e4c4}
+.site-nav a[aria-current="page"]:after{content:"";position:absolute;right:2px;top:50%;width:4px;height:4px;background:currentColor;border-radius:50%}
+.site-nav a:hover,.site-nav a:focus-visible{color:#20261b}
+.page-snapshot .portfolio{transition:none}
+
+
+@media(max-width:650px){
+ .portfolio{padding-right:82px}
+ .main-header{min-height:85px;flex-wrap:nowrap;padding-top:0;padding-bottom:0}
+ .site-nav{right:5px;top:50%;width:72px;gap:8px;order:initial}
+ .site-nav a{padding:13px 7px;font-size:10px}
+ .main-header .contact-pill{display:none}
+ .hero{height:calc(100svh - 135px)}
+ .hero-role{max-width:120px}.hero-role span{font-size:10px}
+ .hero-social{top:90px}.hero-social>span{font-size:11px}
+ h1{font-size:15vw}
+ .hero-description{width:min(220px,100%)}
+ .contact-details a{font-size:11px;overflow-wrap:anywhere}
+ .main-footer{gap:12px;flex-wrap:wrap}
+}
+
+/* Navigation is a viewport sibling, never part of a transformed page. */
+.site-nav{position:fixed;z-index:40}
+body:has(.entrance:not(.dismissed))>.site-nav{visibility:hidden;pointer-events:none}
+body.page-changing>.site-nav{pointer-events:none}
+.book-scene{position:fixed;inset:0;z-index:12;pointer-events:none;perspective:1800px;perspective-origin:50% 45%;overflow:hidden}
+.book-sheet{position:absolute;inset:0;transform-style:preserve-3d}
+.book-strip{position:absolute;left:0;top:0;height:100%;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
+.book-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#111210}
+.book-face-back{transform:rotateY(180deg);background:linear-gradient(110deg,#cbd6d9aa,#c4cebf88 45%,#e5d9e4aa)}
+.book-texture{position:absolute;top:0;overflow:hidden}
+
+.book-ground-shadow{position:fixed;inset:0;z-index:11;pointer-events:none;background:linear-gradient(90deg,#0009,transparent 75%);opacity:0}
+
+/* Freeze decorative motion in page textures to avoid repainting every strip. */
+.book-texture *{animation:none!important;transition:none!important}
+.book-texture .portfolio{transition:none;opacity:1}
+.book-face-back{border:0;background:linear-gradient(90deg,#d1dcd2a6,#bdcbd18c 50%,#e3d9dda6)}
