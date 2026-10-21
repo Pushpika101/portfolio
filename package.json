@@ -1,1 +1,11 @@
-{"name":"pushpika-portfolio","version":"1.0.0","private":true,"scripts":{"dev":"python3 -m http.server 5173","check":"node --check script.js"}}
+{
+  "name": "pushpika-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "dev": "node tools/build.mjs && python3 -m http.server 5173",
+    "check": "node tools/check.mjs"
+  },
+  "type": "module"
+}

@@ -1,18 +1,39 @@
 # Pushpika Anuradha — Portfolio
 
-A dependency-free, responsive portfolio combining a proximity-sensitive white entrance with a dark portrait-led homepage.
+A static multipage portfolio with a dark entrance, persistent right-side navigation, and a curved 3D page turn.
 
-## Preview
+## Run and debug
 
-Run `npm run dev` and open http://localhost:5173. You can also open `index.html` directly. Run `npm run check` to check JavaScript syntax.
+Run `npm run dev`, then open http://localhost:5173. Use the HTTP server: JavaScript modules and animated navigation require HTTP rather than opening files directly.
 
-## Personalize
+After editing HTML in `screens/` or `layouts/`, run `npm run build` and refresh. JavaScript and CSS edits only need a refresh. Run `npm run check` to check every script and verify all generated pages are current.
 
-- The edited portrait is `assets/pushpika-portrait.png`, used in the homepage hero.
-- Replace `assets/entrance.svg` with your preferred entrance image.
-- Add real projects to `projects.html`. The current artwork is a clearly labeled placeholder, not a claimed project.
-- Each page has shared header/footer markup. Keep contact details and navigation consistent across `index.html`, `about.html`, `projects.html`, and `contact.html`.
+## Screen files
 
-The intro supports pointer proximity, keyboard focus, touch, reduced motion, and skipping. Home, About, Projects, and Contact are separate HTML pages. Right-side navigation progressively enhances normal links with a translucent page-turn reveal and browser history support. Direct links and refreshes work on any static host. The footer can replay the entrance.
+| Edit this file | What it controls | Preview |
+| --- | --- | --- |
+| `screens/entrance.html` | Loading/entrance pill and intro text | `/index.html` |
+| `screens/home.html` | Portrait, social links, and ticker | `/index.html#home` (skips intro) |
+| `screens/about.html` | About page | `/about.html` |
+| `screens/projects.html` | Projects page | `/projects.html` |
+| `screens/contact.html` | Contact page | `/contact.html` |
+| `layouts/page.html` | Shared document, header, footer, and fixed navigation | Every page |
 
-Deploy the folder to any static host; no build or runtime dependencies are needed. Google Fonts is optional; the site falls back to Arial offline.
+The root HTML files are generated entry pages. Edit their source screen or layout instead; the build preserves the existing URLs and marks the active navigation tab.
+
+## JavaScript debugging
+
+- `script.js`: application entry point.
+- `scripts/dom.js`: persistent elements and shared transition locks.
+- `scripts/entrance.js`: proximity hover, Explore, and entrance animation.
+- `scripts/navigation.js`: page fetching, browser history, replay, and navigation click handling.
+- `scripts/animations/page-turn.js`: curved sheet geometry, timing, and rendering. Set breakpoints here when debugging the page turn.
+- `style.css`: shared appearance, responsive layouts, and animation surface styles.
+
+For page-content debugging, open its direct URL. Enable your browser's reduced-motion emulation to skip transitions and isolate layout issues. Navigation stays outside animated page content.
+
+## Assets and deployment
+
+The portrait is `assets/pushpika-portrait.png`. Real projects still need to replace the labeled placeholder in `screens/projects.html`.
+
+Run `npm run build` before deploying. Serve the project as static files, including the generated root HTML, `script.js`, `scripts/`, `style.css`, and `assets/`. No runtime dependencies are required. Google Fonts falls back to Arial offline.
