@@ -1,4 +1,5 @@
 import { entrance, portal, portfolio, state } from "./dom.js";
+import { alignEntrancePortrait } from "./entrance.js";
 import { turnPage } from "./animations/page-turn.js";
 
 const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
@@ -9,7 +10,7 @@ async function navigatePage(url, source, push = true) {
   state.navigating = true;
   let snapshot;
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-cache' });
     if (!response.ok) throw new Error('Page could not be loaded');
     const next = new DOMParser().parseFromString(await response.text(), 'text/html');
     const nextPortfolio = next.querySelector('.portfolio');
@@ -66,13 +67,16 @@ document.addEventListener('click', async event => {
     entrance.classList.remove('dismissed'); entrance.inert = false; entrance.removeAttribute('aria-hidden');
     portfolio.inert = true; portfolio.setAttribute('aria-hidden', 'true'); portfolio.classList.remove('active');
     portal.style.setProperty('--proximity', '0');
-    window.scrollTo({top:0,behavior:'instant'}); portal.focus({preventScroll:true});
+    window.scrollTo({top:0,behavior:'instant'});
+    alignEntrancePortrait();
+    portal.focus({preventScroll:true});
     return;
   }
   const link = event.target.closest('a[href]');
   if (!link || (!portfolio.contains(link) && !link.closest('.site-nav')) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
   const url = new URL(link.href);
   if (url.origin !== location.origin || !pageFiles.includes(url.pathname.split('/').pop())) return;
+  if (url.pathname === location.pathname && url.hash) return;
   event.preventDefault();
   const currentFile = location.pathname.split('/').pop() || 'index.html';
   if (url.pathname.split('/').pop() === currentFile) return;

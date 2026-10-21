@@ -13,6 +13,7 @@ export async function renderScreen(screen) {
   const values = {
     screen: (await readFile(new URL(`screens/${screen.name}.html`, root), 'utf8')).trim(),
     title: screen.title, page: screen.name,
+    header: ['projects', 'contact'].includes(screen.name) ? '' : '<header class="main-header"><a class="wordmark" href="index.html">Pushpika<span>↗</span></a><a class="contact-pill" href="contact.html">Let’s talk <span>●</span></a></header>',
     entranceClass: isHome ? '' : ' dismissed',
     entranceAttributes: isHome ? '' : 'inert aria-hidden="true"',
     portfolioClass: isHome ? '' : ' active',

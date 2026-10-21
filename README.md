@@ -34,6 +34,8 @@ For page-content debugging, open its direct URL. Enable your browser's reduced-m
 
 ## Assets and deployment
 
-The portrait is `assets/pushpika-portrait.png`. Real projects still need to replace the labeled placeholder in `screens/projects.html`.
+The portrait is `assets/pushpika-portrait.png`. Five project slots are ready in `screens/projects.html`. Each `PROJECT 1` through `PROJECT 5` comment marks one editable card. Replace its title, category, year, and the text in its project details dialog. Remove unused `<article>` blocks to show fewer projects.
+
+For a real cover, replace the `.cover-sculpture` element with `<img class="project-cover-image" src="assets/your-project.jpg" alt="Describe your project screenshot">` and remove the `.cover-note` placeholder. Replace the two `.project-links` spans with links to your live demo and repository when available. Run `npm run build` after edits.
 
 Run `npm run build` before deploying. Serve the project as static files, including the generated root HTML, `script.js`, `scripts/`, `style.css`, and `assets/`. No runtime dependencies are required. Google Fonts falls back to Arial offline.

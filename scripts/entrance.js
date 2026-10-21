@@ -1,5 +1,27 @@
 import { entrance, portal, portfolio, theme, state } from "./dom.js";
 
+// Both views render the same image box; hover changes only its clipping window.
+export function alignEntrancePortrait() {
+  const homeImage = portfolio.querySelector('.portrait img');
+  const entranceImage = portal.querySelector('img');
+  if (!homeImage || !entranceImage) return;
+  const home = homeImage.getBoundingClientRect();
+  const windowRect = portal.getBoundingClientRect();
+  const offsetX = home.left + home.width / 2 - (windowRect.left + windowRect.width / 2);
+  const offsetY = home.top + home.height / 2 - (windowRect.top + windowRect.height / 2);
+  Object.assign(entranceImage.style, {
+    width: `${home.width}px`,
+    height: `${home.height}px`,
+    left: `calc(50% + ${offsetX}px)`,
+    top: `calc(50% + ${offsetY}px)`,
+    objectFit: 'contain',
+    objectPosition: '50% 50%',
+  });
+}
+alignEntrancePortrait();
+window.addEventListener('resize', alignEntrancePortrait);
+document.fonts.ready.then(alignEntrancePortrait);
+
 let frame;
 function updateProximity(event) {
   if (state.entering || entrance.classList.contains('dismissed')) return;
@@ -7,7 +29,7 @@ function updateProximity(event) {
   frame = requestAnimationFrame(() => {
     const rect = portal.getBoundingClientRect();
     const distance = Math.hypot(event.clientX - (rect.left + rect.width / 2), event.clientY - (rect.top + rect.height / 2));
-    const proximity = Math.max(0, Math.min(1, 1 - (distance - 100) / 340));
+    const proximity = Math.max(0, Math.min(1, 1 - (distance - 150) / 450));
     portal.style.setProperty('--proximity', proximity.toFixed(3));
   });
 }
@@ -50,7 +72,10 @@ export async function enter(target = '#home', animate = true) {
   state.entering = false;
 }
 document.addEventListener('pointermove', updateProximity);
-document.addEventListener('pointerleave', () => portal.style.setProperty('--proximity', '0'));
+document.addEventListener('pointerleave', () => {
+  cancelAnimationFrame(frame);
+  portal.style.setProperty('--proximity', '0');
+});
 portal.addEventListener('focus', () => portal.style.setProperty('--proximity', '1'));
 portal.addEventListener('click', () => enter());
 document.querySelector('.skip').addEventListener('click', () => enter('#home', false));

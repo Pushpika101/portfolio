@@ -12,8 +12,8 @@
 .intro-index{color:#828b76}
 
 /* Compact blurred entrance; the homepage reveals from these exact bounds. */
-.portal{width:min(calc(210px + var(--proximity)*100px),80vw);height:170px;border-radius:999px;background:#171c15;clip-path:none;transform:translate(-50%,-50%);transition:width .18s ease;box-shadow:0 0 30px #a4b8910d}
-.portal img{position:absolute;left:50%;top:50%;width:340px;max-width:none;height:200px;object-fit:cover;object-position:center 38%;filter:blur(12px);transform:translate(-50%,-50%);opacity:.7}
+.portal{width:min(calc(210px + var(--proximity)*470px),86vw);height:min(calc(170px + var(--proximity)*170px),44vh);border-radius:999px;background:#171c15;clip-path:none;transform:translate(-50%,-50%);transition:width .24s ease,height .24s ease;box-shadow:0 0 30px #a4b8910d}
+.portal img{position:absolute;left:50%;top:50%;width:calc(min(680px,86vw) + 40px);max-width:none;height:calc(min(340px,44vh) + 40px);object-fit:cover;object-position:center 38%;filter:blur(12px);transform:translate(-50%,-50%);opacity:.7}
 @media(pointer:coarse){.portal{--proximity:1}}
 .portal-copy{font-size:16px}
 .portal-copy small{font-size:10px;margin:6px}
@@ -89,3 +89,95 @@ body.page-changing>.site-nav{pointer-events:none}
 .book-texture *{animation:none!important;transition:none!important}
 .book-texture .portfolio{transition:none;opacity:1}
 .book-face-back{border:0;background:linear-gradient(90deg,#d1dcd2a6,#bdcbd18c 50%,#e3d9dda6)}
+
+/* Keep the homepage portrait centered on the entrance, accounting for the tab gutter. */
+.hero .portrait{left:calc(50% + 70px);top:calc(44svh - 100px)}
+@media(max-width:800px){.hero .portrait{top:calc(44svh - 85px)}}
+@media(max-width:650px){.hero .portrait{left:calc(50% + 41px)}}
+
+/* Compact project gallery with consistent cover sizes. */
+.selected-work{padding:32px 3.5% 48px;background:#0b0c0a}
+.selected-heading{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;margin-bottom:28px}
+.selected-label{font-size:11px;margin-top:0}
+.selected-heading h2{font-size:clamp(32px,4vw,56px);line-height:1.04;letter-spacing:-.065em;margin:0;font-weight:500}
+.all-projects{border:1px solid #34372f;border-radius:40px;padding:13px 18px;font-size:13px;white-space:nowrap}
+.all-projects span{font-size:9px;margin-left:10px}
+.all-projects:hover{background:#20241c}
+.project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 20px;align-items:start;scroll-margin-top:35px}
+.work-card{min-width:0}
+.project-trigger{list-style:none;cursor:pointer}
+.project-trigger::-webkit-details-marker{display:none}
+.project-trigger:focus-visible{outline:2px solid #a4b891;outline-offset:8px;border-radius:20px}
+.work-cover{position:relative;aspect-ratio:1.6;overflow:hidden;border-radius:20px;background:#c3c9bd;color:#252e23;isolation:isolate}
+.work-card:nth-child(even) .work-cover{aspect-ratio:1.6}
+.cover-index,.cover-note{position:absolute;left:24px;font-size:10px;letter-spacing:1.6px;z-index:2}
+.cover-index{top:24px}.cover-note{bottom:24px;letter-spacing:.6px}
+.cover-open{position:absolute;right:20px;bottom:19px;width:35px;height:35px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;transition:transform .25s}
+.project-trigger:hover .cover-open{transform:rotate(45deg)}
+.cover-sculpture{position:absolute;inset:15%;display:grid;place-items:center;transform:rotate(-25deg)}
+.cover-sculpture i{position:absolute;width:66%;aspect-ratio:1;border-radius:22%;background:linear-gradient(135deg,#f2f3df,#758365);box-shadow:20px 30px 40px #24312044;border:1px solid #ffffff55}
+.cover-sculpture i:nth-child(1){transform:translate(-22%,-22%)}
+.cover-sculpture i:nth-child(2){transform:translate(0,0)}
+.cover-sculpture i:nth-child(3){transform:translate(22%,22%)}
+.cover-2{background:#b96845;color:#fff0e0}.cover-2 .cover-sculpture i{background:linear-gradient(135deg,#527ff7,#0035aa);border-radius:50%;border-color:#7192f9;box-shadow:20px 30px 40px #59200d66}
+.cover-3{background:#a8b8c6;color:#21323f}.cover-3 .cover-sculpture{transform:rotate(25deg)}.cover-3 .cover-sculpture i{border-radius:8px;background:linear-gradient(135deg,#eef7ff,#66829b)}
+.cover-4{background:#c5b0cd;color:#3b2644}.cover-4 .cover-sculpture i{border-radius:50% 50% 8% 8%;background:linear-gradient(135deg,#f0def5,#86599a)}
+.cover-5{background:#c9b778;color:#3c321b}.cover-5 .cover-sculpture i{border-radius:4px;background:linear-gradient(135deg,#fff1bf,#a48a3d)}
+.work-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px}
+.work-title h3{font-size:20px;font-weight:400;letter-spacing:-.6px;margin:0}
+.detail-toggle{font-size:10px;color:#b2b6a8;white-space:nowrap}.detail-toggle b{display:inline-block;font-size:18px;margin-left:6px;font-weight:400;transition:transform .2s}
+.project-details[open] .detail-toggle b{transform:rotate(45deg)}
+.work-meta{display:flex;justify-content:space-between;gap:15px;color:#8e9387;font-size:13px;margin-top:6px}
+.project-body{margin-top:24px;border-top:1px solid #34382e;padding-top:22px;color:#a8ae9f;font-size:14px;line-height:1.75}
+.project-intro{margin-top:0;color:#d4d8cc;font-size:16px}
+.project-facts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:25px 0}
+.project-facts dt{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#7d8771}
+.project-facts dd{margin:3px 0 0;color:#d4d8cc}
+.project-body h4{font-size:15px;font-weight:500;color:#eeede5;margin:25px 0 8px}
+.project-body p{margin-bottom:0}.tech-tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0}.tech-tags li{padding:4px 12px;border:1px solid #3d4434;border-radius:20px;font-size:12px}
+.feature-list{padding-left:18px}.project-links{display:flex;flex-wrap:wrap;gap:16px;border-top:1px solid #34382e;margin-top:28px;padding-top:20px;font-size:12px;color:#929b86}
+@media(max-width:1100px){.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.selected-heading{gap:16px}.selected-label{display:none}.selected-heading{grid-template-columns:1fr auto}.detail-toggle{font-size:0}.detail-toggle b{font-size:18px}}
+@media(max-width:650px){.selected-work{padding:24px 5% 36px}.selected-heading{gap:12px;margin-bottom:22px;grid-template-columns:1fr}.selected-heading h2{font-size:38px}.all-projects{justify-self:start;font-size:11px;padding:9px 13px}.project-grid{grid-template-columns:1fr;gap:26px}.work-cover,.work-card:nth-child(even) .work-cover{aspect-ratio:1.6;border-radius:15px}.work-title h3{font-size:18px}.cover-index,.cover-note{left:16px;font-size:8px}.cover-open{right:14px;width:28px;height:28px}.work-meta{font-size:11px}.project-facts{gap:15px}.project-body{font-size:13px}}
+
+
+.project-cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* Five unequal tiles form one compact feature board. */
+.project-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:180px 220px 190px;gap:16px;align-items:stretch}
+.work-card{position:relative;min-width:0;margin:0;border-radius:22px;isolation:isolate}
+.work-card:nth-child(1){grid-area:1 / 1 / 3 / 8}
+.work-card:nth-child(2){grid-area:1 / 8 / 2 / 13}
+.work-card:nth-child(3){grid-area:2 / 8 / 3 / 13}
+.work-card:nth-child(4){grid-area:3 / 1 / 4 / 6}
+.work-card:nth-child(5){grid-area:3 / 6 / 4 / 13}
+.project-details{position:absolute;inset:0}
+.project-trigger{display:block;position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;border-radius:22px;text-align:left;color:inherit;background:transparent;overflow:hidden}
+.work-card .work-cover{height:100%;aspect-ratio:auto!important;border-radius:22px}
+.work-cover:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#080b0ce8);pointer-events:none;z-index:2}
+.work-card .work-title{position:absolute;left:22px;right:22px;bottom:43px;z-index:3;margin:0;color:#fff}
+.work-card .work-title h3{font-size:22px;font-weight:500}
+.work-card .work-meta{position:absolute;left:22px;right:22px;bottom:20px;z-index:3;margin:0;color:#d8dcd3;font-size:12px}
+.work-card .detail-toggle{color:#fff;font-size:0}.work-card .detail-toggle b{font-size:25px}
+.work-card .cover-note,.work-card .cover-open{display:none}
+.work-card .cover-index{top:18px;left:22px;font-size:9px}
+.work-card .cover-sculpture{inset:12% 25%}
+.work-card:first-child .cover-sculpture{inset:15%}
+.work-card .project-body{display:none}
+.project-dialog{color:#eeede5;background:#161a14;border:1px solid #444d3c;border-radius:24px;width:min(720px,calc(100vw - 32px));max-height:85svh;padding:32px}
+.project-dialog::backdrop{background:#030503b8;backdrop-filter:blur(12px)}
+.project-dialog h2{font-size:36px;margin:4px 45px 20px 0}
+.project-dialog .project-body{display:block;margin-top:0}
+.project-dialog-close{position:absolute;right:16px;top:16px;border:1px solid #535f48;border-radius:50%;width:34px;height:34px;background:#272f21;color:#fff;font-size:22px}
+body:has(.project-dialog[open]){overflow:hidden}
+@media(max-width:900px) and (min-width:651px){.project-grid{grid-template-rows:160px 200px 170px;gap:12px}.work-card .work-title h3{font-size:18px}.work-card .work-meta{font-size:10px}}
+@media(max-width:650px){.project-grid{grid-template-columns:1fr;grid-template-rows:320px 190px 250px 210px 280px;gap:14px}.work-card:nth-child(n){grid-area:auto}.work-card .work-title,.work-card .work-meta{left:16px;right:16px}.project-dialog{padding:24px}.project-dialog h2{font-size:28px}}
+
+/* Keep the hit area still while the visible card follows the pointer. */
+.work-card{--tilt-x:0deg;--tilt-y:0deg;--light-x:50%;--light-y:50%;min-height:0;align-self:stretch}
+.project-trigger{transform:perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));transition:transform .35s ease,box-shadow .35s ease;box-shadow:0 0 0 1px #ffffff20;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.project-trigger:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;opacity:0;background:radial-gradient(circle at var(--light-x) var(--light-y),#e5ffe54d,transparent 65%);box-shadow:inset 0 0 0 1px #e7ffdc80;transition:opacity .3s}
+.work-card.is-hovered{z-index:5}
+.work-card.is-hovered .project-trigger{transition:transform .12s ease-out,box-shadow .3s;box-shadow:0 16px 35px #0007,0 0 28px #add9aa50}
+.work-card.is-hovered .project-trigger:after,.project-trigger:focus-visible:after{opacity:1}
+@media(hover:hover) and (pointer:fine){.project-trigger:hover:after{opacity:1}}
+@media(prefers-reduced-motion:reduce){.project-trigger{transform:none}}
