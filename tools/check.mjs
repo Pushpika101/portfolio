@@ -17,7 +17,9 @@ for (const screen of screens) {
   assert.equal(await readFile(screen.file, 'utf8'), html, `${screen.file} is stale: run npm run build`);
   assert.ok(html.includes(`id="${screen.name}"`));
   assert.equal((html.match(/aria-current="page"/g) || []).length, 1);
-  assert.ok(html.includes('type="module" src="script.js"'));
+  assert.match(html, /type="module" src="script\.js\?v=[^"]+"/);
+  assert.match(html, /href="style\.css\?v=[^"]+"/);
+  if (screen.name === 'projects') assert.ok(html.includes('class="selected-work orbit-ready"'));
   assert.ok(!html.includes('{{'));
 }
 console.log('All scripts and four generated screens passed checks.');

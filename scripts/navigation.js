@@ -1,6 +1,7 @@
 import { entrance, portal, portfolio, state } from "./dom.js";
 import { alignEntrancePortrait } from "./entrance.js";
 import { turnPage } from "./animations/page-turn.js";
+import { mountProjectOrbit } from "./animations/project-orbit.js?v=projects-stack-3";
 
 const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
 history.replaceState({portfolio:true}, '', location.href);
@@ -21,6 +22,10 @@ async function navigatePage(url, source, push = true) {
     snapshot.inert = true;
     snapshot.setAttribute('aria-hidden', 'true');
     const previous = portfolio.cloneNode(true);
+    const originalCards = portfolio.querySelectorAll('.orbit-ready .work-card');
+    previous.querySelectorAll('.orbit-ready .work-card').forEach((card, index) => {
+      card.style.transform = getComputedStyle(originalCards[index]).transform;
+    });
     previous.style.transform = `translateY(-${oldScroll}px)`;
     snapshot.append(previous);
     document.body.append(snapshot);
@@ -38,6 +43,7 @@ async function navigatePage(url, source, push = true) {
     entrance.setAttribute('aria-hidden', 'true');
     portfolio.classList.add('active', 'revealing');
     window.scrollTo({top:0, behavior:'instant'});
+    const startProjects = mountProjectOrbit({defer:true});
     if (push) history.pushState({portfolio:true}, '', url);
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       await turnPage(snapshot);
@@ -47,7 +53,8 @@ async function navigatePage(url, source, push = true) {
     document.body.classList.remove('page-changing');
     portfolio.inert = false;
     portfolio.setAttribute('aria-hidden','false');
-    const heading = portfolio.querySelector('h1,h2');
+    startProjects();
+    const heading = portfolio.querySelector('.orbit-ready') || portfolio.querySelector('h1,h2');
     if (heading) {heading.tabIndex = -1;heading.focus({preventScroll:true});}
   } catch (error) {
     // Real HTML destinations also work if fetch or animation is unavailable.
