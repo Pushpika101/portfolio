@@ -2,6 +2,7 @@ import { mountAboutReveal } from './animations/about-reveal.js?v=about-toolkit-7
 import { entrance, portal, portfolio, state } from "./dom.js";
 import { alignEntrancePortrait } from "./entrance.js";
 import { turnPage } from "./animations/page-turn.js";
+import { freezeAboutSnapshot } from './animations/page-snapshot.js';
 import { mountProjectOrbit } from "./animations/project-orbit.js?v=about-toolkit-7";
 
 const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
@@ -23,6 +24,7 @@ async function navigatePage(url, source, push = true) {
     snapshot.inert = true;
     snapshot.setAttribute('aria-hidden', 'true');
     const previous = portfolio.cloneNode(true);
+    freezeAboutSnapshot(portfolio, previous);
     const originalCards = portfolio.querySelectorAll('.orbit-ready .work-card');
     previous.querySelectorAll('.orbit-ready .work-card').forEach((card, index) => {
       card.style.transform = getComputedStyle(originalCards[index]).transform;
