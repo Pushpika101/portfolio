@@ -14,6 +14,7 @@ export function mountProjectOrbit({defer = false} = {}) {
   controls.innerHTML = '<span>SELECT A PROJECT TO EXPLORE</span><button type="button" class="orbit-view" aria-pressed="false">View grid</button>';
   section.append(controls);
   section.classList.add('orbit-running');
+  section.classList.remove('orbit-settled');
   section.setAttribute('aria-label', 'Selected projects');
   grid.inert = true;
   controls.hidden = true;
@@ -47,6 +48,7 @@ export function mountProjectOrbit({defer = false} = {}) {
       card.style.opacity = '1';
     });
     section.classList.add('orbit-intro-complete');
+    section.classList.add('orbit-settled');
     grid.inert = false;
     controls.hidden = false;
   }
@@ -104,7 +106,7 @@ export function mountProjectOrbit({defer = false} = {}) {
     controls.remove();
     grid.inert = false;
     cards.forEach(card => {card.style.removeProperty('opacity');card.style.removeProperty('transform');});
-    section.classList.remove('orbit-running', 'orbit-grid-view', 'orbit-intro-complete');
+    section.classList.remove('orbit-running', 'orbit-grid-view', 'orbit-intro-complete', 'orbit-settled');
   };
   if (!defer) start();
   return start;

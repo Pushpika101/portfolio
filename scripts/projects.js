@@ -4,24 +4,111 @@ dialog.className = 'project-dialog';
 dialog.setAttribute('aria-labelledby', 'project-dialog-title');
 dialog.innerHTML = '<button class="project-dialog-close" aria-label="Close project details">×</button><h2 id="project-dialog-title"></h2><div class="project-dialog-content"></div>';
 document.body.append(dialog);
+const panel = document.createElement('div');
+panel.className = 'project-detail-panel';
+panel.append(...dialog.childNodes);
+dialog.append(panel);
 let source;
-dialog.querySelector('button').addEventListener('click', () => dialog.close());
+let sourceCard;
+let opening = false;
+let closing = false;
+let transition = Promise.resolve();
+let runningAnimations = [];
+
+function animateCardSwap(reverse = false) {
+  if (reducedMotion.matches || !source?.isConnected) return Promise.resolve();
+  const from = source.getBoundingClientRect();
+  const to = panel.getBoundingClientRect();
+  const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+  const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+  // Use the real card size, not its larger rotated bounding rectangle.
+  const cardWidth = source.offsetWidth;
+  const cardHeight = source.offsetHeight;
+  const sx = cardWidth / to.width;
+  const sy = cardHeight / to.height;
+  const orientation = new DOMMatrix(getComputedStyle(sourceCard).transform);
+  orientation.m41 = orientation.m42 = orientation.m43 = 0;
+  const restingTransform = `perspective(1100px) ${orientation.toString()}`;
+  const front = document.createElement('div');
+  front.className = 'work-card project-flip-front';
+  front.inert = true;
+  front.setAttribute('aria-hidden', 'true');
+  const cover = source.cloneNode(true);
+  cover.removeAttribute('id');
+  cover.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+  cover.tabIndex = -1;
+  front.append(cover);
+  Object.assign(front.style, {
+    left:`${from.left + (from.width - cardWidth) / 2}px`,
+    top:`${from.top + (from.height - cardHeight) / 2}px`,
+    width:`${cardWidth}px`, height:`${cardHeight}px`,
+  });
+  dialog.append(front);
+  const frontFrames = [
+    {offset:0, opacity:1, transform:restingTransform},
+    {offset:.48, opacity:1, transform:`perspective(1400px) translate(${-dx * .75}px,${-dy * .75}px) rotateY(90deg) scale(${1 / sx},${1 / sy})`},
+    {offset:.49, opacity:0, transform:`perspective(1400px) translate(${-dx}px,${-dy}px) rotateY(90deg) scale(${1 / sx},${1 / sy})`},
+    {offset:1, opacity:0, transform:'rotateY(90deg)'},
+  ];
+  const backFrames = [
+    {offset:0, opacity:0, transform:`perspective(1400px) translate(${dx}px,${dy}px) rotateY(-90deg) scale(${sx},${sy})`},
+    {offset:.47, opacity:0, transform:`perspective(1400px) translate(${dx * .25}px,${dy * .25}px) rotateY(-90deg) scale(.92)`},
+    {offset:.49, opacity:1, transform:`perspective(1400px) translate(${dx * .25}px,${dy * .25}px) rotateY(-88deg) scale(.92)`},
+    {offset:1, opacity:1, transform:'perspective(1400px) translate(0,0) rotateY(0deg) scale(1)'},
+  ];
+  const timing = {duration:reverse ? 1000 : 1400, easing:'cubic-bezier(.35,0,.15,1)', fill:'both', direction:reverse ? 'reverse' : 'normal'};
+  runningAnimations = [front.animate(frontFrames,timing),panel.animate(backFrames,timing)];
+  const start = document.timeline.currentTime;
+  runningAnimations.forEach(animation => {animation.startTime = start;});
+  return Promise.all(runningAnimations.map(animation => animation.finished)).catch(() => {}).finally(() => {
+    if (reverse) {
+      // Restore the real card and remove the modal from the top layer BEFORE
+      // cancelling its final frame, otherwise the full-size panel flashes back.
+      sourceCard?.style.removeProperty('visibility');
+      dialog.close();
+    }
+    runningAnimations.forEach(animation => animation.cancel());
+    runningAnimations = [];
+    front.remove();
+  });
+}
+async function closeProject() {
+  if (closing || !dialog.open) return;
+  closing = true;
+  if (opening) await transition;
+  await animateCardSwap(true);
+  if (dialog.open) {
+    sourceCard?.style.removeProperty('visibility');
+    dialog.close();
+  }
+  closing = false;
+}
+panel.querySelector('button').addEventListener('click', closeProject);
+dialog.addEventListener('cancel', event => {event.preventDefault();closeProject();});
 dialog.addEventListener('click', event => {
-  if (event.target !== dialog) return;
-  const rect = dialog.getBoundingClientRect();
-  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  if (event.target === dialog) closeProject();
 });
-dialog.addEventListener('close', () => source?.focus({preventScroll:true}));
+dialog.addEventListener('close', () => {
+  if (sourceCard) sourceCard.style.removeProperty('visibility');
+  source?.focus({preventScroll:true});
+});
+// Resizing should finish the current transition rather than leave a stale clone.
+window.addEventListener('resize', () => runningAnimations.forEach(animation => animation.finish()));
 document.addEventListener('click', event => {
-  const summary = event.target.closest('.project-trigger');
-  if (!summary) return;
+  const summary = event.target.closest('.portfolio .project-trigger');
+  if (!summary || dialog.open || opening || closing) return;
   event.preventDefault();
   source = summary;
-  dialog.querySelector('h2').textContent = summary.querySelector('h3').textContent;
-  dialog.querySelector('.project-dialog-content').replaceChildren(summary.parentElement.querySelector('.project-body').cloneNode(true));
+  sourceCard = summary.closest('.work-card');
+  panel.querySelector('h2').textContent = summary.querySelector('h3').textContent;
+  panel.querySelector('.project-dialog-content').replaceChildren(summary.parentElement.querySelector('.project-body').cloneNode(true));
   resetHover();
   dialog.showModal();
-  dialog.scrollTop = 0;
+  panel.scrollTop = 0;
+  opening = true;
+  transition = animateCardSwap();
+  sourceCard.style.visibility = 'hidden';
+  transition.finally(() => { opening = false; });
 });
 
 const hoverEnabled = window.matchMedia('(hover: hover) and (pointer: fine)');

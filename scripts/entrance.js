@@ -78,6 +78,4 @@ document.addEventListener('pointerleave', () => {
 });
 portal.addEventListener('focus', () => portal.style.setProperty('--proximity', '1'));
 portal.addEventListener('click', () => enter());
-document.querySelector('.skip').addEventListener('click', () => enter('#home', false));
-document.querySelector('.monogram').addEventListener('click', event => {event.preventDefault();enter();});
 
