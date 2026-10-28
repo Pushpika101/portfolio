@@ -1,3 +1,4 @@
+import { mountContactReveal } from './animations/contact-reveal.js';
 import { mountAboutReveal } from './animations/about-reveal.js?v=about-toolkit-7';
 import { entrance, portal, portfolio, state } from "./dom.js";
 import { alignEntrancePortrait } from "./entrance.js?v=entrance-clean-12";
@@ -46,6 +47,7 @@ async function navigatePage(url, source, push = true) {
     entrance.setAttribute('aria-hidden', 'true');
     portfolio.classList.add('active', 'revealing');
     window.scrollTo({top:0, behavior:'instant'});
+    const startContact = mountContactReveal({defer:true});
     const startProjects = mountProjectOrbit({defer:true});
     const startAbout = mountAboutReveal({defer:true});
     if (push) history.pushState({portfolio:true}, '', url);
@@ -58,6 +60,7 @@ async function navigatePage(url, source, push = true) {
     portfolio.inert = false;
     portfolio.setAttribute('aria-hidden','false');
     startProjects();
+    startContact();
     startAbout();
     const heading = portfolio.querySelector('.orbit-ready') || portfolio.querySelector('h1,h2');
     if (heading) {heading.tabIndex = -1;heading.focus({preventScroll:true});}
