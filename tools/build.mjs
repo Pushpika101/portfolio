@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = new URL('../', import.meta.url);
 const layout = await readFile(new URL('layouts/page.html', root), 'utf8');
@@ -10,8 +10,23 @@ export const screens = [
 ];
 export async function renderScreen(screen) {
   const isHome = screen.name === 'home';
+  let content = (await readFile(new URL(`screens/${screen.name}.html`, root), 'utf8')).trim();
+  if (screen.name === 'projects') {
+    const galleries = await Promise.all(Array.from({length:5}, async (_, index) => {
+      const folder = `project-${index + 1}`;
+      const entries = await readdir(new URL(`assets/projects/${folder}/`, root), {withFileTypes:true});
+      const images = entries.filter(entry => entry.isFile() && /\.(jpe?g|png|webp|avif|svg)$/i.test(entry.name))
+        .map(entry => entry.name).sort((a, b) => a.localeCompare(b, 'en', {numeric:true}));
+      const tags = images.map(name => `<img src="assets/projects/${folder}/${encodeURIComponent(name)}" alt="">`).join('');
+      return {folder, tags};
+    }));
+    for (const {folder, tags} of galleries) {
+      content = content.replace(`<template class="project-gallery" data-project-folder="${folder}"></template>`,
+        `<template class="project-gallery" data-project-folder="${folder}">${tags}</template>`);
+    }
+  }
   const values = {
-    screen: (await readFile(new URL(`screens/${screen.name}.html`, root), 'utf8')).trim(),
+    screen: content,
     title: screen.title, page: screen.name,
     header: ['about', 'projects', 'contact'].includes(screen.name) ? '' : '<header class="main-header"><a class="wordmark" href="index.html">Pushpika<span>↗</span></a><a class="contact-pill" href="contact.html">Let’s talk <span>●</span></a></header>',
     entranceClass: isHome ? '' : ' dismissed',

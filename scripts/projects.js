@@ -1,8 +1,10 @@
+import { createProjectHero } from './project-gallery.js';
+
 // Delegation keeps project interactions working after animated page navigation.
 const dialog = document.createElement('dialog');
 dialog.className = 'project-dialog';
 dialog.setAttribute('aria-labelledby', 'project-dialog-title');
-dialog.innerHTML = '<button class="project-dialog-close" aria-label="Close project details">×</button><h2 id="project-dialog-title"></h2><div class="project-dialog-content"></div>';
+dialog.innerHTML = '<div class="project-dialog-toolbar"><button class="project-dialog-close" aria-label="Close project details">×</button></div><div class="project-hero-slot"></div><div class="project-dialog-content"></div>';
 document.body.append(dialog);
 const panel = document.createElement('div');
 panel.className = 'project-detail-panel';
@@ -100,7 +102,8 @@ document.addEventListener('click', event => {
   event.preventDefault();
   source = summary;
   sourceCard = summary.closest('.work-card');
-  panel.querySelector('h2').textContent = summary.querySelector('h3').textContent;
+  panel.querySelector('.project-hero-slot').replaceChildren(createProjectHero(summary));
+  panel.classList.add('project-opening');
   panel.querySelector('.project-dialog-content').replaceChildren(summary.parentElement.querySelector('.project-body').cloneNode(true));
   resetHover();
   dialog.showModal();
@@ -108,7 +111,7 @@ document.addEventListener('click', event => {
   opening = true;
   transition = animateCardSwap();
   sourceCard.style.visibility = 'hidden';
-  transition.finally(() => { opening = false; });
+  transition.finally(() => { opening = false; panel.classList.remove('project-opening'); });
 });
 
 const hoverEnabled = window.matchMedia('(hover: hover) and (pointer: fine)');

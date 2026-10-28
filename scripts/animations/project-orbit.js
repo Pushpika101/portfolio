@@ -1,10 +1,12 @@
+import { portfolio } from '../dom.js';
+
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 let dispose = () => {};
 
 // Prepare the title before navigation; start the cards only after the page turn.
 export function mountProjectOrbit({defer = false} = {}) {
   dispose();
-  const section = document.querySelector('.portfolio .selected-work');
+  const section = portfolio.querySelector('.selected-work');
   if (!section) return () => {};
   const grid = section.querySelector('.project-grid');
   const cards = [...grid.querySelectorAll('.work-card')];
@@ -22,6 +24,8 @@ export function mountProjectOrbit({defer = false} = {}) {
   const view = controls.querySelector('button');
   let animations = [];
   let titleAnimation;
+  let layoutAnimations = [];
+  let switchingView = false;
   let started = false;
   let finished = false;
   let gridView = false;
@@ -90,16 +94,50 @@ export function mountProjectOrbit({defer = false} = {}) {
     }).catch(() => {});
     arrange();
   }
-  view.addEventListener('click', () => {
+  view.addEventListener('click', async () => {
+    if (switchingView) return;
+    const before = cards.map(card => card.getBoundingClientRect());
+    const controlsBefore = controls.getBoundingClientRect();
     gridView = !gridView;
     section.classList.toggle('orbit-grid-view', gridView);
     view.textContent = gridView ? 'View circle' : 'View grid';
     view.setAttribute('aria-pressed', String(gridView));
     titleAnimation?.cancel();
     settle();
+    if (reduced.matches) return;
+    switchingView = true;
+    view.disabled = true;
+    grid.inert = true;
+    const timing = {duration:750, easing:'cubic-bezier(.22,1,.36,1)', fill:'both'};
+    const after = cards.map(card => card.getBoundingClientRect());
+    layoutAnimations = cards.map((card, index) => {
+      const first = before[index];
+      const last = after[index];
+      const finalTransform = getComputedStyle(card).transform;
+      const base = finalTransform === 'none' ? '' : finalTransform;
+      // Invert the layout movement around the card center, then release it.
+      const dx = first.left + first.width / 2 - last.left - last.width / 2;
+      const dy = first.top + first.height / 2 - last.top - last.height / 2;
+      return card.animate([
+        {transform:`translate(${dx}px,${dy}px) scale(${first.width / last.width},${first.height / last.height}) ${base}`},
+        {transform:finalTransform},
+      ], timing);
+    });
+    const controlsAfter = controls.getBoundingClientRect();
+    layoutAnimations.push(controls.animate([
+      {transform:`translateY(${controlsBefore.top - controlsAfter.top}px)`},
+      {transform:'translateY(0)'},
+    ], timing));
+    if (gridView) layoutAnimations.push(title.animate([{opacity:0}, {opacity:1}], {duration:450, delay:150, fill:'both'}));
+    await Promise.all(layoutAnimations.map(animation => animation.finished)).catch(() => {});
+    layoutAnimations.forEach(animation => animation.cancel());
+    layoutAnimations = [];
+    switchingView = false;
+    if (alive) { view.disabled = false; grid.inert = false; }
   });
   dispose = () => {
     alive = false;
+    layoutAnimations.forEach(animation => animation.cancel());
     animations.forEach(animation => animation.cancel());
     titleAnimation?.cancel();
     resize.disconnect();

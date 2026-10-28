@@ -1,9 +1,11 @@
+import { portfolio } from '../dom.js';
+
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 let dispose = () => {};
 
 export function mountAboutReveal({defer = false} = {}) {
   dispose();
-  const section = document.querySelector('.portfolio .about-story');
+  const section = portfolio.querySelector('.about-story');
   if (!section) return () => {};
   const card = section.querySelector('.about-details-card');
   const toolkit = section.querySelector('.about-toolkit');

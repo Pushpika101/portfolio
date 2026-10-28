@@ -1,9 +1,11 @@
+import { portfolio } from '../dom.js';
+
 let dispose = () => {};
 
 // Keep the incoming page title alone until the page turn has finished.
 export function mountContactReveal({defer = false} = {}) {
   dispose();
-  const section = document.querySelector('.portfolio .contact-stage');
+  const section = portfolio.querySelector('.contact-stage');
   if (!section) return () => {};
   const tokens = section.querySelector('.contact-tokens');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');

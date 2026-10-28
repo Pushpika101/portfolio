@@ -12,6 +12,9 @@ async function checkJS(directory) {
 execFileSync(process.execPath, ['--check', 'script.js']);
 await checkJS('scripts');
 await checkJS('tools');
+await import('./check-snapshot.mjs');
+execFileSync(process.execPath, ['tools/check-page-turn.mjs'], {stdio:'inherit'});
+execFileSync(process.execPath, ['tools/check-navigation-scope.mjs'], {stdio:'inherit'});
 for (const screen of screens) {
   const html = await renderScreen(screen);
   assert.equal(await readFile(screen.file, 'utf8'), html, `${screen.file} is stale: run npm run build`);

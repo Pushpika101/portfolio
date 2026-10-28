@@ -1,10 +1,10 @@
-import { mountContactReveal } from './animations/contact-reveal.js';
-import { mountAboutReveal } from './animations/about-reveal.js?v=about-toolkit-7';
+import { mountContactReveal } from './animations/contact-reveal.js?v=live-scope-26';
+import { mountAboutReveal } from './animations/about-reveal.js?v=live-scope-26';
 import { entrance, portal, portfolio, state } from "./dom.js";
 import { alignEntrancePortrait } from "./entrance.js?v=entrance-clean-12";
-import { turnPage } from "./animations/page-turn.js";
-import { freezeAboutSnapshot } from './animations/page-snapshot.js';
-import { mountProjectOrbit } from "./animations/project-orbit.js?v=card-hitarea-16";
+import { turnPage } from "./animations/page-turn.js?v=turn-handoff-28";
+import { freezePageSnapshot } from './animations/page-snapshot.js?v=frozen-frame-25';
+import { mountProjectOrbit } from "./animations/project-orbit.js?v=layout-flow-30";
 
 const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
 history.replaceState({portfolio:true}, '', location.href);
@@ -25,11 +25,7 @@ async function navigatePage(url, source, push = true) {
     snapshot.inert = true;
     snapshot.setAttribute('aria-hidden', 'true');
     const previous = portfolio.cloneNode(true);
-    freezeAboutSnapshot(portfolio, previous);
-    const originalCards = portfolio.querySelectorAll('.orbit-ready .work-card');
-    previous.querySelectorAll('.orbit-ready .work-card').forEach((card, index) => {
-      card.style.transform = getComputedStyle(originalCards[index]).transform;
-    });
+    freezePageSnapshot(portfolio, previous);
     previous.style.transform = `translateY(-${oldScroll}px)`;
     snapshot.append(previous);
     document.body.append(snapshot);
@@ -51,7 +47,8 @@ async function navigatePage(url, source, push = true) {
     const startProjects = mountProjectOrbit({defer:true});
     const startAbout = mountAboutReveal({defer:true});
     if (push) history.pushState({portfolio:true}, '', url);
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const animateTurn = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (animateTurn) {
       await turnPage(snapshot);
     }
     portfolio.classList.remove('revealing');
@@ -59,6 +56,11 @@ async function navigatePage(url, source, push = true) {
     document.body.classList.remove('page-changing');
     portfolio.inert = false;
     portfolio.setAttribute('aria-hidden','false');
+    // Paint the destination after restoring normal layout, then begin its
+    // entrance. Keep those layout reads out of the page-turn cleanup frame.
+    if (animateTurn) {
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
     startProjects();
     startContact();
     startAbout();

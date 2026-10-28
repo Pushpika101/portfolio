@@ -82,9 +82,13 @@ export async function turnPage(previousPage) {
   try {
     await Promise.all(animations.map(animation => animation.finished));
   } finally {
-    animations.forEach(animation => animation.cancel());
+    // Let the final curled frame paint before tearing down the DOM textures.
+    // Otherwise cleanup competes with the last visible frame of the turn.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    // Detach before cancelling so filled transforms never snap back on screen.
     scene.remove();
     shadow.remove();
+    animations.forEach(animation => animation.cancel());
   }
 }
 

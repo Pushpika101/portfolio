@@ -39,3 +39,9 @@ The portrait is `assets/pushpika-portrait.png`. Five project slots are ready in 
 For a real cover, replace the `.cover-sculpture` element with `<img class="project-cover-image" src="assets/your-project.jpg" alt="Describe your project screenshot">` and remove the `.cover-note` placeholder. Replace the two `.project-links` spans with links to your live demo and repository when available. Run `npm run build` after edits.
 
 Run `npm run build` before deploying. Serve the project as static files, including the generated root HTML, `script.js`, `scripts/`, `style.css`, and `assets/`. No runtime dependencies are required. Google Fonts falls back to Arial offline.
+
+## Project photo folders
+
+Add images directly to `assets/projects/project-1/` through `assets/projects/project-5/` for the matching project card. JPG, JPEG, PNG, WebP, AVIF, and SVG are supported. Use numbered filenames like `01-overview.webp`, `02-dashboard.webp`, and `03-mobile.webp` to set the order.
+
+Run `npm run build` after adding, removing, or renaming images, then refresh. The build automatically fills each project’s flowing photo gallery; no HTML edits are needed. Empty folders retain the placeholder artwork. Card covers are still configured separately as described above.
