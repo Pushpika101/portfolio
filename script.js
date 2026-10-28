@@ -3,8 +3,8 @@ import { mountAboutReveal } from './scripts/animations/about-reveal.js?v=live-sc
 // Application entry point. Screen content lives in screens/.
 import { enter } from './scripts/entrance.js?v=entrance-clean-12';
 import './scripts/navigation.js?v=layout-flow-30';
-import './scripts/projects.js?v=project-gallery-29';
-import { mountProjectOrbit } from './scripts/animations/project-orbit.js?v=layout-flow-30';
+import './scripts/projects.js?v=project-card-depth-40';
+import { mountProjectOrbit } from './scripts/animations/project-orbit.js?v=project-card-depth-40';
 
 mountProjectOrbit();
 mountContactReveal();

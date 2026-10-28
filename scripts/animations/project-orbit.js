@@ -20,7 +20,12 @@ export function mountProjectOrbit({defer = false} = {}) {
   section.setAttribute('aria-label', 'Selected projects');
   grid.inert = true;
   controls.hidden = true;
-  cards.forEach(card => {card.style.opacity = '0';});
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    const trigger = card.querySelector('.project-trigger');
+    const projectName = card.querySelector('.work-title h3')?.textContent;
+    if (trigger && projectName) trigger.dataset.hoverTitle = projectName;
+  });
   const view = controls.querySelector('button');
   let animations = [];
   let titleAnimation;

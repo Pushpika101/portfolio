@@ -1,4 +1,4 @@
-import { createProjectHero } from './project-gallery.js';
+import { createProjectCaseStudy, createProjectHero } from './project-gallery.js?v=all-project-layout-39';
 
 // Delegation keeps project interactions working after animated page navigation.
 const dialog = document.createElement('dialog');
@@ -104,7 +104,7 @@ document.addEventListener('click', event => {
   sourceCard = summary.closest('.work-card');
   panel.querySelector('.project-hero-slot').replaceChildren(createProjectHero(summary));
   panel.classList.add('project-opening');
-  panel.querySelector('.project-dialog-content').replaceChildren(summary.parentElement.querySelector('.project-body').cloneNode(true));
+  panel.querySelector('.project-dialog-content').replaceChildren(createProjectCaseStudy(summary));
   resetHover();
   dialog.showModal();
   panel.scrollTop = 0;
@@ -123,7 +123,7 @@ function resetHover() {
   cancelAnimationFrame(hoverFrame);
   if (activeCard) {
     activeCard.classList.remove('is-hovered');
-    for (const property of ['--tilt-x','--tilt-y','--light-x','--light-y']) activeCard.style.removeProperty(property);
+    for (const property of ['--tilt-x','--tilt-y','--light-x','--light-y','--parallax-x','--parallax-y','--lift-x','--lift-y']) activeCard.style.removeProperty(property);
   }
   activeCard = null;
 }
@@ -141,10 +141,14 @@ document.addEventListener('pointermove', event => {
   const y = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height));
   cancelAnimationFrame(hoverFrame);
   hoverFrame = requestAnimationFrame(() => {
-    card.style.setProperty('--tilt-x', `${(0.5 - y) * 7}deg`);
-    card.style.setProperty('--tilt-y', `${(x - 0.5) * 7}deg`);
+    card.style.setProperty('--tilt-x', `${(0.5 - y) * 12}deg`);
+    card.style.setProperty('--tilt-y', `${(x - 0.5) * 12}deg`);
     card.style.setProperty('--light-x', `${x * 100}%`);
     card.style.setProperty('--light-y', `${y * 100}%`);
+    card.style.setProperty('--parallax-x', `${(x - 0.5) * -18}px`);
+    card.style.setProperty('--parallax-y', `${(y - 0.5) * -14}px`);
+    card.style.setProperty('--lift-x', `${(x - 0.5) * 7}px`);
+    card.style.setProperty('--lift-y', `${(y - 0.5) * 6}px`);
   });
 });
 document.addEventListener('pointerleave', resetHover);

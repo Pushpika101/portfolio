@@ -4,7 +4,7 @@ import { entrance, portal, portfolio, state } from "./dom.js";
 import { alignEntrancePortrait } from "./entrance.js?v=entrance-clean-12";
 import { turnPage } from "./animations/page-turn.js?v=turn-handoff-28";
 import { freezePageSnapshot } from './animations/page-snapshot.js?v=frozen-frame-25';
-import { mountProjectOrbit } from "./animations/project-orbit.js?v=layout-flow-30";
+import { mountProjectOrbit } from "./animations/project-orbit.js?v=project-card-depth-40";
 
 const pageFiles = ['index.html', 'about.html', 'projects.html', 'contact.html'];
 history.replaceState({portfolio:true}, '', location.href);
